@@ -11,8 +11,8 @@ import './style.scss';
 
 const { __ } = wp.i18n; // Import __() from wp.i18n
 const { registerBlockType } = wp.blocks; // Import registerBlockType() from wp.blocks
-const { RichText, MediaUpload, BlockControls, AlignmentToolbar } = wp.editor;
-const { IconButton } = wp.components;
+const { RichText, MediaUpload, BlockControls, AlignmentToolbar, InspectorControls, ColorPalette } = wp.editor;
+const { IconButton, PanelBody } = wp.components;
 
 /**
  * Register: aa Gutenberg Block.
@@ -68,13 +68,18 @@ registerBlockType( 'cgb/block-cool-hero-alex', {
 			type: 'string',
 			default: 'center',
 		},
+
+		textColor: {
+            type: 'string', 
+            default: '#000000'
+        }
 	},
 	supports: {
 		align: [ 'wide', 'full' ],
 	},
 	edit: ( props ) => {
 		// Extract the contents from props
-		const { attributes: { heroTitle, heroText, heroImage, alignContent }, setAttributes } = props;
+		const { attributes: { heroTitle, heroText, heroImage, alignContent, textColor}, setAttributes } = props;
 
 		// Reads the contents from the title
 		const onChangeTitle = newTitle => {
@@ -95,7 +100,28 @@ registerBlockType( 'cgb/block-cool-hero-alex', {
 		const onChangeAlignment = newAlignment => {
 			setAttributes( { alignContent: newAlignment } );
 		};
+
+		// access the HEX value from the color pallete
+        const onChangeTextColor = newColor => {
+            setAttributes( { textColor : newColor } )
+		};
+		
 		return (
+			<React.Fragment>
+			<InspectorControls>
+				<PanelBody title='Color Options'>
+					<div className="components-base-control">
+						<div className="components-base-control__field">
+							<label className="components-base-control__label">
+								Main text and tagline's Color
+							</label>
+							<ColorPalette
+								onChange={onChangeTextColor}
+							/>
+						</div>
+					</div>
+				</PanelBody>
+			</InspectorControls>
 
 			<div className="hero-block" style={ { backgroundImage: `url( ${ heroImage } )` } }>
 				<BlockControls>
@@ -122,7 +148,7 @@ registerBlockType( 'cgb/block-cool-hero-alex', {
 						placeholder="Add the Title"
 						onChange={ onChangeTitle }
 						value={ heroTitle }
-						style={ { textAlign: alignContent } }
+						style={ { textAlign: alignContent, color: textColor } }
 					/>
 				</h1>
 				<p>
@@ -130,10 +156,11 @@ registerBlockType( 'cgb/block-cool-hero-alex', {
 						placeholder="Add the Tagline"
 						onChange={ onChangeText }
 						value={ heroText }
-						style={ { textAlign: alignContent } }
+						style={ { textAlign: alignContent, color: textColor } }
 					/>
 				</p>
 			</div>
+			</React.Fragment>
 		);
 	},
 
